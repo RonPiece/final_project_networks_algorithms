@@ -9,26 +9,29 @@
 #       jupytext_version: 1.19.2
 #   kernelspec:
 #     display_name: Python 3
+#     language: python
 #     name: python3
 # ---
 
 # %% [markdown] id="ME8cFHsK2So_"
 # # Topological Analysis and Vulnerability Identification in Software Supply Chains
 # **Case study:** Flowise (AI Agent Orchestration Framework)
-# רון הוא גבר
+#
 # ## Reading Guide
 # This notebook is organized as a short research report:
 # - **Phase 1** - Setup and Tooling
 # - **Phase 2** - Data Extraction and Graph Construction
 # - **Phase 3** - Bottleneck Detection (Betweenness Centrality)
+# - **Phase 3b** - Spectral Centrality Analysis (PageRank & HITS)
+# - **Phase 3c** - Distance-Based Contagion Assessment (Harmonic Centrality)
 # - **Phase 4** - Vulnerability Blast Radius Validation
 # - **Phase 5** - Community Detection and Functional Segmentation
 # - **Phase 6** - Edge Betweenness (Girvan-Newman Approach)
 # - **Phase 7** - Scale-Free Network Properties Validation
 # - **Phase 8** - Robustness Analysis and Disruption Simulation
 # - **Phase 9** - Empirical Validation via CVE Threat Intel
+# - **Phase 10** - Link Prediction (Forecasting Lateral Movement)
 #
-# מוטי הוא גבר
 # ## Main Question
 # Which packages in Flowise act as structural bridges or single points of failure, and why does that matter for supply-chain risk?
 #
@@ -151,12 +154,12 @@ for i, comm in enumerate(communities):
 
 # 3. Generate a dynamic color map for the distinct communities
 num_communities = len(communities)
-cmap = cm.get_cmap('tab20', num_communities)
+cmap = plt.get_cmap('tab20')
 
 color_map = []
 for node in undirected_G.nodes():
     comm_id = node_to_community.get(node, 0)
-    color_map.append(cmap(comm_id))
+    color_map.append(cmap((comm_id % 20) / 20))
 
 # 4. Calculate the visual layout (Force-Directed Spring Layout)
 plt.figure(figsize=(15, 15))
@@ -254,7 +257,7 @@ df_hubs = df_spectral.sort_values(by="Hub Score (HITS)", ascending=False).reset_
 df_hubs.index += 1
 print("\nTop 5 Operational Hubs (High Out-Degree Infection Spreaders):")
 display(df_hubs.head(5))
-print("Calculation complete. Rendering spectral components...")
+print("Spectral Centrality calculation complete.")
 
 
 # %% [markdown]
@@ -287,7 +290,7 @@ df_harmonic.index += 1
 
 print("Top 5 Packages with the Highest Infection Velocity (Fastest Blast Radius Spread):")
 display(df_harmonic.head(5))
-print("Calculation complete. Rendering velocity metrics...")
+print("Harmonic Centrality calculation complete.")
 
 
 # %% [markdown]
@@ -295,96 +298,11 @@ print("Calculation complete. Rendering velocity metrics...")
 #
 # Harmonic centrality pinpoints packages with the most efficient reach across the software architecture. A threat actor exploiting these specific nodes ensures their payload traverses the ecosystem via the absolute shortest paths available.
 #
-
-# %% [markdown]
-# ## Phase 3b | Spectral Centrality Analysis (PageRank & HITS)
 #
-# **Goal.** Evaluate the "structural authority" of packages using spectral decomposition.
 #
-# **Method.** Calculate PageRank and HITS (Hubs and Authorities) for the directed dependency graph.
+# ## Phase 3 Overall Takeaway
 #
-# **Why this choice.** Betweenness Centrality identifies structural bridges, but open-source supply chains are inherently directional. Finding 'Authorities' (foundational libraries) and 'Hubs' (orchestrators) highlights packages that can inject malicious code into vast downstream networks simultaneously.
-#
-
-# %%
-import networkx as nx
-import pandas as pd
-
-print("Executing Spectral Centrality Algorithms on Directed Graph...")
-
-# 1. Compute PageRank
-pagerank_scores = nx.pagerank(dependency_graph, alpha=0.85)
-
-# 2. Compute HITS
-hubs_scores, auth_scores = nx.hits(dependency_graph, max_iter=500)
-
-# 3. Compile results
-spectral_data = []
-for node in dependency_graph.nodes():
-    spectral_data.append({
-        "Package Name": node,
-        "PageRank": round(pagerank_scores.get(node, 0), 6),
-        "Authority Score (HITS)": round(auth_scores.get(node, 0), 6),
-        "Hub Score (HITS)": round(hubs_scores.get(node, 0), 6)
-    })
-
-df_spectral = pd.DataFrame(spectral_data)
-
-df_auth = df_spectral.sort_values(by="Authority Score (HITS)", ascending=False).reset_index(drop=True)
-df_auth.index += 1
-print("Top 5 Structural Authorities (High In-Degree Vulnerability Targets):")
-display(df_auth.head(5))
-
-df_hubs = df_spectral.sort_values(by="Hub Score (HITS)", ascending=False).reset_index(drop=True)
-df_hubs.index += 1
-print("\nTop 5 Operational Hubs (High Out-Degree Infection Spreaders):")
-display(df_hubs.head(5))
-print("Calculation complete. Rendering spectral components...")
-
-
-# %% [markdown]
-# ## Phase 3b Takeaway
-#
-# The spectral analysis accurately segments the network into orchestration hubs and foundational authorities. High-authority components surface as prime targets for widespread, cascading supply chain contagion.
-#
-
-# %% [markdown]
-# ## Phase 3c | Distance-Based Contagion Assessment (Harmonic Centrality)
-#
-# **Goal.** Evaluate distance-based metrics to predict the propagation velocity of a potential vulnerability.
-#
-# **Method.** Calculate Harmonic Centrality, summing the reciprocal of shortest path distances.
-#
-# **Why this choice.** Standard Closeness Centrality struggles with isolated peripheral nodes. Harmonic Centrality gracefully handles structural fragmentation, identifying targets with the highest "infection velocity" (requiring minimal hops to compromise the entire ecosystem).
-#
-
-# %%
-print("Calculating Distance-Based Harmonic Centrality...")
-
-harmonic_scores = nx.harmonic_centrality(dependency_graph)
-
-harmonic_data = [
-    {"Package Name": node, "Harmonic Centrality": round(score, 2)}
-    for node, score in harmonic_scores.items()
-]
-df_harmonic = pd.DataFrame(harmonic_data).sort_values(by="Harmonic Centrality", ascending=False).reset_index(drop=True)
-df_harmonic.index += 1
-
-print("Top 5 Packages with the Highest Infection Velocity (Fastest Blast Radius Spread):")
-display(df_harmonic.head(5))
-print("Calculation complete. Rendering velocity metrics...")
-
-
-# %% [markdown]
-# ## Phase 3c Takeaway
-#
-# Harmonic centrality pinpoints packages with the most efficient reach across the software architecture. A threat actor exploiting these specific nodes ensures their payload traverses the ecosystem via the absolute shortest paths available.
-#
-
-# %% [markdown]
-# ## Phase 3 Takeaway
-#
-# The ranking is not just a popularity list. It identifies structural choke points: packages that connect multiple communities and can expand the blast radius of a compromise.
+# Across all three centrality perspectives—bridging power (Betweenness), structural authority (PageRank/HITS), and propagation velocity (Harmonic)—the same small set of packages consistently emerges at the top. This convergence confirms that these are not merely popular libraries, but genuine structural choke points whose compromise would maximize the blast radius of a supply-chain attack.
 
 # %% [markdown] id="p6jOO7lR2nxd"
 # ## Phase 4 | Vulnerability Blast Radius
@@ -593,7 +511,7 @@ print("Enhanced Macro-Architecture Visualization Complete.")
 import networkx as nx
 import pandas as pd
 
-print("Performing Global Edge Betweenness Analysis (All 2171 Nodes)...")
+print(f"Performing Global Edge Betweenness Analysis (All {dependency_graph.number_of_nodes()} Nodes)...")
 
 # Recover full undirected graph if needed
 if 'undirected_G' not in globals() and 'undirected_G' not in locals():
@@ -621,9 +539,9 @@ print("\n🚨 Top 10 Most Critical Dependency Links (Edges) in the ENTIRE Ecosys
 display(df_global_critical_edges)
 
 # %% [markdown]
-# ## Phase 6 Macro Architecture Takeaway
+# ## Phase 6 Takeaway
 #
-# We simplified thousands of dependencies into functional communities revealing the systemic gravity of Community #1. The dominant red sphere heavily anchors the overall architecture, indicating that targeting central components inside it gives an attacker the highest probability of propagating infection laterally to the whole system.
+# The Edge Betweenness analysis reveals the most structurally loaded dependency links in the ecosystem. These critical edges act as the primary communication bridges between otherwise separate clusters. Severing even a small number of these high-betweenness edges would fragment the network into isolated components, effectively disrupting the entire software supply chain.
 
 # %% [markdown] id="gE2EkZpZ3Z9-"
 # ## Phase 7 | Scale-Free Network Properties Verification
@@ -706,7 +624,7 @@ plt.show()
 
 # Final Impact Assessment
 total_loss = ((initial_lwcc - degradation_history[-1]) / initial_lwcc) * 100
-print(f"Calculation complete. Rendering chart...")
+print(f"Simulation complete. Total LWCC degradation: {total_loss:.1f}%")
 
 # %% [markdown]
 # ## Phase 8 Takeaway
@@ -752,7 +670,7 @@ display(df_validation)
 
 # Output summary metric
 critical_matches = len(df_validation[df_validation['Severity'] == 'CRITICAL'])
-print(f"\nCalculation complete. Rendering validation matrix...")
+print(f"\nValidation complete. {critical_matches} CRITICAL and {len(df_validation) - critical_matches} HIGH severity matches found.")
 
 # %% [markdown]
 # ## Phase 9 Takeaway
@@ -806,60 +724,9 @@ else:
     print(f"Node '{target_node}' not found in the graph.")
 
 # %% [markdown]
-# ## Phase 11 | Link Prediction (Forecasting Lateral Movement)
+# ## Phase 10 Takeaway
 #
-# **Goal.** Forecast potential paths for lateral movement following the compromise of a central target (
-#
-#
-# orm-data).
-#
-# **Method.** Apply link prediction algorithms (Jaccard Coefficient) on an undirected projection of the network to calculate structural similarity between unconnected nodes.
-#
-# **Why this choice.** After a threat actor breaches a primary bottleneck, they seek high-value neighboring targets to maximize their footprint. Identifying structurally similar packages highlights the most probable secondary targets for an attacker expanding their blast radius.
-#
-
-# %%
-import networkx as nx
-import pandas as pd
-
-print("Executing Link Prediction for Lateral Movement Forecasting...")
-
-target_node = 'form-data'
-
-if target_node in undirected_G:
-    non_edges = []
-    for n in undirected_G.nodes():
-        if target_node != n and not undirected_G.has_edge(target_node, n):
-            non_edges.append((target_node, n))
-
-    predictions = nx.jaccard_coefficient(undirected_G, non_edges)
-
-    pred_list = []
-    for u, v, p in predictions:
-        if p > 0:
-            pred_list.append({
-                "Compromised Source": u,
-                "Predicted Target": v,
-                "Infection Probability (Jaccard)": round(p, 4)
-            })
-
-    df_preds = pd.DataFrame(pred_list).sort_values(by="Infection Probability (Jaccard)", ascending=False).reset_index(drop=True)
-    df_preds.index += 1
-
-    print(f"\nTop 5 Most Probable Targets for Lateral Movement from '{target_node}':")
-    display(df_preds.head(5))
-    print("\nCalculation complete. Rendering probable lateral targets...")
-else:
-    print(f"Node '{target_node}' not found in the graph.")
-
-
-# %% [markdown]
-# ## Phase 11 Takeaway
-#
-# The Link Prediction analysis indicates that packages sharing a large number of common neighbors with 
-#
-#
-# orm-data represent structural "blind spots." They are the most logical secondary targets for an attacker attempting lateral movement within the identical developer neighborhood without triggering cross-boundary alerts.
+# The Link Prediction analysis indicates that packages sharing a large number of common neighbors with `form-data` represent structural "blind spots." They are the most logical secondary targets for an attacker attempting lateral movement within the identical developer neighborhood without triggering cross-boundary alerts.
 #
 
 # %% [markdown]
@@ -876,8 +743,8 @@ else:
 #    - *Brandes, U. (2001).* "A Faster Algorithm for Betweenness Centrality." Supports the computational efficiency of the algorithms used in NetworkX.
 #
 # 3. **Network Robustness & Scale-Free Properties:**
-#    - *Barabási, A. L., & Albert, R. (1999).* "Emergence of Scaling in Random Networks." The core theory for Phase 6, explaining the $P(k) \sim k^{-\gamma}$ distribution.
-#    - *Albert, R., Jeong, H., & Barabási, A. L. (2000).* "Error and Attack Tolerance of Complex Networks." Provides the theoretical basis for the Targeted Removal Simulation performed in Phase 7.
+#    - *Barabási, A. L., & Albert, R. (1999).* "Emergence of Scaling in Random Networks." The core theory for Phase 7, explaining the $P(k) \sim k^{-\gamma}$ distribution.
+#    - *Albert, R., Jeong, H., & Barabási, A. L. (2000).* "Error and Attack Tolerance of Complex Networks." Provides the theoretical basis for the Targeted Removal Simulation performed in Phase 8.
 #
 # 4. **Community Detection:**
 #    - *Clauset, A., Newman, M. E., & Moore, C. (2004).* "Finding Community Structure in Very Large Networks." The basis for the modularity maximization used in Phase 5.
