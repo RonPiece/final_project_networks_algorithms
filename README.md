@@ -34,42 +34,37 @@ The analysis covers **2,150+ unique package nodes** and **5,035+ directed depend
 ├── flowise_exact_version_advisories.csv      # Fixed advisory snapshot for offline & reproducible execution
 ├── requirements.txt                          # Python package dependencies
 ├── README.md                                 # Project documentation & execution guide
-└── final files/                              # Deliverables directory containing notebook, advisories, PDF paper & docx report
-    ├── final_project_networks_algorithms final.ipynb
-    ├── flowise_exact_version_advisories.csv
-    ├── מפת המוקשים של עולם התוכנה (4).pdf
-    └── של פרויקט מסכם אבנר - דוח סופי 8  להגשה עמודים.docx
+└── docs/                                     # Project deliverables directory
+    ├── final_project_networks_algorithms.ipynb
+    ├── מפת המוקשים של עולם התוכנה.pdf
+    └── של פרויקט מסכם אבנר - דוח סופי 8 עמודים.docx
 ```
 
 ---
 
-## Running the Notebook
+## Running the Project
 
-The notebook uses the fixed advisory snapshot:
+The project can be executed directly in Google Colab or locally.
 
-`flowise_exact_version_advisories.csv`
+1. Open the notebook using the provided Colab link or open `final_project_networks_algorithms final.ipynb` locally.
+2. Select `Runtime → Run all` (or Run All Cells).
 
-For reproducible results, keep the CSV file in the same directory as the notebook.
+The notebook automatically:
 
-### Recommended execution
+- installs the required `powerlaw` and `cvss` packages if missing;
+- downloads the submitted exact-version advisory snapshot from GitHub if it is not present in the runtime;
+- executes the complete graph and security analysis.
 
-1. Download or clone the complete GitHub repository.
-2. Verify that the following files are located in the same directory:
-   - `final_project_networks_algorithms.ipynb`
-   - `flowise_exact_version_advisories.csv`
-3. Open the notebook from that directory.
-4. Run all cells in order.
+No manual file upload or code modification is required.
 
-The notebook automatically installs `powerlaw==2.0.0` and `cvss==3.6` if they are not already installed.
-
-By default:
+By default, the notebook uses the fixed advisory snapshot submitted with the project to reproduce the reported results:
 
 ```python
 REFRESH_ADVISORY_DATA = False
 ```
 
 > **Note on `REFRESH_ADVISORY_DATA`:**  
-> When set to `False` (default), the notebook relies on the pre-fetched snapshot `flowise_exact_version_advisories.csv` to ensure deterministic, fully offline, and fast execution. If set to `True`, the notebook will query live APIs (`deps.dev` and OSV) to fetch real-time vulnerability advisory records.
+> When set to `False` (default), the notebook relies on the submitted snapshot `flowise_exact_version_advisories.csv` (downloading it automatically if needed) to ensure deterministic, fully offline, and fast execution. Setting `REFRESH_ADVISORY_DATA = True` retrieves current live advisory information from deps.dev and OSV. Because these databases are updated continuously, refreshed results may differ from the submitted report.
 
 ---
 
