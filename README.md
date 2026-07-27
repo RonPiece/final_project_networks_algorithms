@@ -151,7 +151,7 @@ The notebook is organized into 10 structured analytical phases:
 
 ## Authors & Citation
 
-- **Ron Blenky**
+- **Ron Blanki**
 - **Moty Sakhartov**
 - **Idan Dahan**
 
