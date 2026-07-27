@@ -22,7 +22,7 @@ jupytext:
 
 This project maps and analyzes the software supply chain of the `flowise` ecosystem (v3.1.2) using advanced Network Science methodologies. By modeling package dependencies as a **Directed Graph (`DiGraph`)**, we identify structural vulnerabilities, critical bottlenecks, functional communities, and single points of failure (SPOFs) that could be exploited in targeted cyber attacks (e.g., zero-day exploits, malicious package injections).
 
-The analysis covers **2,150+ unique package nodes** and **5,035+ directed dependency edges**, combining theoretical graph algorithms with real-world CVE threat intelligence from GitHub Advisories and the Open Source Vulnerability (OSV) database.
+The analysis covers **2,138 unique package nodes** and **5,016 directed dependency edges**, combining theoretical graph algorithms with real-world CVE threat intelligence from GitHub Advisories and the Open Source Vulnerability (OSV) database.
 
 ---
 
@@ -31,6 +31,7 @@ The analysis covers **2,150+ unique package nodes** and **5,035+ directed depend
 ```
 final_project_networks_algorithms/
 ├── final_project_networks_algorithms.ipynb   # Main research notebook containing all 10 analysis phases
+├── flowise_dependency_graph_snapshot.json    # Fixed dependency graph API snapshot for deterministic execution
 ├── flowise_exact_version_advisories.csv      # Fixed advisory snapshot for offline & reproducible execution
 ├── requirements.txt                          # Python package dependencies
 ├── README.md                                 # Project documentation & execution guide
@@ -48,13 +49,14 @@ The project can be executed seamlessly either locally or in Google Colab.
 
 ### 1. Local Execution (Cloned Repository)
 
-When running locally from the cloned repository, the notebook loads the dataset directly from the root directory via:
+When running locally from the cloned repository, the notebook loads both fixed snapshot files directly from the root directory via:
 
 ```python
+GRAPH_CACHE_PATH = Path("flowise_dependency_graph_snapshot.json")
 ADVISORY_CACHE_PATH = Path("flowise_exact_version_advisories.csv")
 ```
 
-No path modifications or file uploads are necessary.
+No path modifications or manual file uploads are necessary.
 
 1. Clone or download the repository.
 2. Install required packages: `pip install -r requirements.txt`
@@ -69,17 +71,18 @@ If executing directly in Google Colab without cloning the full repository:
 
 The notebook automatically:
 - Installs missing dependencies (`powerlaw` and `cvss`).
-- Detects if `flowise_exact_version_advisories.csv` is missing from the Colab runtime and automatically downloads the exact snapshot from GitHub Raw.
-- Executes the complete 10-phase analysis cleanly.
+- Detects if `flowise_dependency_graph_snapshot.json` or `flowise_exact_version_advisories.csv` are missing from the Colab runtime and downloads the exact snapshots automatically from GitHub Raw.
+- Executes the complete 10-phase analysis deterministically.
 
-By default, the notebook uses the fixed advisory snapshot submitted with the project:
+By default, the notebook relies on the fixed project snapshots:
 
 ```python
+REFRESH_GRAPH_DATA = False
 REFRESH_ADVISORY_DATA = False
 ```
 
-> **Note on `REFRESH_ADVISORY_DATA`:**  
-> When set to `False` (default), the notebook relies on the submitted snapshot `flowise_exact_version_advisories.csv` to ensure deterministic, fully offline, and fast execution. Setting `REFRESH_ADVISORY_DATA = True` queries live APIs (`deps.dev` and OSV) for updated advisories. Since vulnerability databases are updated continuously, refreshed live results may differ from the submitted report.
+> **Note on Refresh Flags:**  
+> When set to `False` (default), the notebook relies on the submitted snapshots `flowise_dependency_graph_snapshot.json` and `flowise_exact_version_advisories.csv` to ensure deterministic, fully offline, and fast execution. Setting the flags to `True` queries live APIs (`deps.dev` and OSV) for updated graph metadata and advisories. Since upstream databases are updated continuously, refreshed live results may differ slightly from the submitted report.
 
 ---
 
@@ -125,7 +128,7 @@ The notebook is organized into 10 structured analytical phases:
 - Constructs and visualizes Ego-Networks ("Blast Radius") around high-centrality bottleneck packages to illustrate local propagation risk.
 
 ### Phase 5: Community Detection & Structural Segmentation
-- Applies **Clauset-Newman-Moore Greedy Modularity Maximization** and **Louvain** algorithms to group 2,150+ packages into distinct functional communities (e.g., HTTP utilities, DB connectors, cryptography, build tooling).
+- Applies **Clauset-Newman-Moore Greedy Modularity Maximization** and **Louvain** algorithms to group 2,138 packages into distinct functional communities (e.g., HTTP utilities, DB connectors, cryptography, build tooling).
 - **Phase 5.2 - 5.4:** Computes Global & Internal **Edge Betweenness Centrality** and performs Girvan–Newman hierarchical community splitting.
 
 ### Phase 6: Global Structural Characterization
