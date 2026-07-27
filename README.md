@@ -14,7 +14,7 @@ jupytext:
 
 **Case Study:** Flowise (AI Agent Orchestration Framework v3.1.2)  
 **Course:** Graph Algorithms | Dr. Avner Priel, 2026  
-**Team Members:** Ron Blenky, Moty Sakhartov, Idan Dahan  
+**Team Members:** Ron Blanki, Moty Sakhartov, Idan Dahan  
 
 ---
 
