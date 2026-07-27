@@ -66,7 +66,7 @@ No path modifications or manual file uploads are necessary.
 
 If executing directly in Google Colab without cloning the full repository:
 
-1. Open the notebook using the Colab link.
+1. Open the notebook using the [Google Colab Link](https://colab.research.google.com/drive/1GjC18KOKnFWmK9YUr38DbpWGGUu5XmGX?usp=sharing).
 2. Select **Runtime → Run all**.
 
 The notebook automatically:
