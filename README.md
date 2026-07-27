@@ -29,42 +29,57 @@ The analysis covers **2,150+ unique package nodes** and **5,035+ directed depend
 ## Repository Structure
 
 ```
-.
+final_project_networks_algorithms/
 ├── final_project_networks_algorithms.ipynb   # Main research notebook containing all 10 analysis phases
 ├── flowise_exact_version_advisories.csv      # Fixed advisory snapshot for offline & reproducible execution
 ├── requirements.txt                          # Python package dependencies
 ├── README.md                                 # Project documentation & execution guide
 └── docs/                                     # Project deliverables directory
-    ├── final_project_networks_algorithms.ipynb
-    ├── מפת המוקשים של עולם התוכנה.pdf
-    └── של פרויקט מסכם אבנר - דוח סופי 8 עמודים.docx
+    ├── final_report.pdf                      # Final PDF project report
+    ├── final_report.docx                     # Final Word project report (.docx)
+    └── final_presentation.pdf                # 10-slide final project presentation
 ```
 
 ---
 
 ## Running the Project
 
-The project can be executed directly in Google Colab or locally.
+The project can be executed seamlessly either locally or in Google Colab.
 
-1. Open the notebook using the provided Colab link or open `final_project_networks_algorithms final.ipynb` locally.
-2. Select `Runtime → Run all` (or Run All Cells).
+### 1. Local Execution (Cloned Repository)
+
+When running locally from the cloned repository, the notebook loads the dataset directly from the root directory via:
+
+```python
+ADVISORY_CACHE_PATH = Path("flowise_exact_version_advisories.csv")
+```
+
+No path modifications or file uploads are necessary.
+
+1. Clone or download the repository.
+2. Install required packages: `pip install -r requirements.txt`
+3. Open `final_project_networks_algorithms.ipynb` and select **Run All Cells**.
+
+### 2. Direct Google Colab Execution
+
+If executing directly in Google Colab without cloning the full repository:
+
+1. Open the notebook using the Colab link.
+2. Select **Runtime → Run all**.
 
 The notebook automatically:
+- Installs missing dependencies (`powerlaw` and `cvss`).
+- Detects if `flowise_exact_version_advisories.csv` is missing from the Colab runtime and automatically downloads the exact snapshot from GitHub Raw.
+- Executes the complete 10-phase analysis cleanly.
 
-- installs the required `powerlaw` and `cvss` packages if missing;
-- downloads the submitted exact-version advisory snapshot from GitHub if it is not present in the runtime;
-- executes the complete graph and security analysis.
-
-No manual file upload or code modification is required.
-
-By default, the notebook uses the fixed advisory snapshot submitted with the project to reproduce the reported results:
+By default, the notebook uses the fixed advisory snapshot submitted with the project:
 
 ```python
 REFRESH_ADVISORY_DATA = False
 ```
 
 > **Note on `REFRESH_ADVISORY_DATA`:**  
-> When set to `False` (default), the notebook relies on the submitted snapshot `flowise_exact_version_advisories.csv` (downloading it automatically if needed) to ensure deterministic, fully offline, and fast execution. Setting `REFRESH_ADVISORY_DATA = True` retrieves current live advisory information from deps.dev and OSV. Because these databases are updated continuously, refreshed results may differ from the submitted report.
+> When set to `False` (default), the notebook relies on the submitted snapshot `flowise_exact_version_advisories.csv` to ensure deterministic, fully offline, and fast execution. Setting `REFRESH_ADVISORY_DATA = True` queries live APIs (`deps.dev` and OSV) for updated advisories. Since vulnerability databases are updated continuously, refreshed live results may differ from the submitted report.
 
 ---
 
