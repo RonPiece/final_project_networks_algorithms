@@ -119,7 +119,7 @@ The notebook is organized into 10 structured analytical phases:
 - **Phase 2.1:** Renders full ecosystem topology visualization ("The Hairball").
 
 ### Phase 3: Topological Centrality Assessment
-- Calculates **Betweenness Centrality** to pinpoint critical structural bridges (e.g., `semver`, `kind-of`, `form-data`).
+- Calculates **Betweenness Centrality** to pinpoint critical structural bridges (e.g., `yargs`, `@grpc/proto-loader`, `form-data`).
 - **Phase 3.1 (Spectral Centrality):** Evaluates PageRank and HITS (Hubs & Authorities) metrics.
 - **Phase 3.2 (Harmonic Centrality):** Measures reverse-dependency reach across disconnected or weakly connected components.
 - **Phase 3.3 (Correlation Analysis):** Analyzes Spearman and Pearson rank correlations between centrality metrics.
@@ -158,7 +158,7 @@ The notebook is organized into 10 structured analytical phases:
 | :--- | :--- | :--- | :--- |
 | **Graph Model** | **Directed Graph (`nx.DiGraph`)** | Dependency risk flows strictly one-way: if package $A$ depends on $B$, a zero-day in $B$ compromises $A$, but not vice versa. | **Undirected Graph:** Creates false bidirectional paths, leading to inaccurate blast radius calculations. |
 | **Centrality Metric** | **Betweenness Centrality** | Identifies "bridge" packages connecting distinct functional domains. Compromising a high-betweenness bridge maximizes attack blast radius. | **In-Degree Centrality:** High degree packages may be isolated within a single domain; high betweenness packages represent true single points of failure. |
-| **Community Detection** | **Greedy Modularity Maximization** | Time complexity $O(N \log^2 N)$ allows fast functional segmentation of 2,150+ packages. | **Classic Girvan-Newman:** $O(E^2 N)$ computation is prohibitively slow for large supply chain graphs. |
+| **Community Detection** | **Greedy Modularity Maximization** | Time complexity $O(N \log^2 N)$ allows fast functional segmentation of 2,138 packages. | **Classic Girvan-Newman:** $O(E^2 N)$ computation is prohibitively slow for large supply chain graphs. |
 
 ---
 
